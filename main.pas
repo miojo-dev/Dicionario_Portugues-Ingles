@@ -1,18 +1,18 @@
-program pointer_list;
+program pointer_lista;
 
 uses crt;
 
 type
     TInfo = string;
-    TNode = ^TElement;
-    TElement = record
-        data : TInfo;
-        next : TNode;
+    TNode = ^TElemento;
+    TElemento = record
+        info : TInfo;
+        prox : TNode;
     end;
 
 var option : byte;
     str : TInfo;
-    str_list : TNode;
+    str_lista : TNode;
 
 procedure ReadInfo(var info : TInfo);
 begin
@@ -21,12 +21,12 @@ begin
     read(info);
 end;
 
-procedure CreateList(var list : TNode);
+procedure CreateList(var lista : TNode);
 begin
-    list := nil;
+    lista := nil;
 end;
 
-procedure Include(var list : TNode; info : TInfo);
+procedure Include(var lista : TNode; info : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
@@ -36,100 +36,100 @@ begin
     end
     else
     begin
-        aux^.data := info;
-        aux^.next := nil;
+        aux^.info := info;
+        aux^.prox := nil;
         
-        if (list = nil) or (info < list^.data) then
+        if (lista = nil) or (info < lista^.info) then
         begin
-            aux^.next := list;
-            list := aux;
+            aux^.prox := lista;
+            lista := aux;
         end
         else
         begin
-            anterior := list;
-            atual := list^.next;
+            anterior := lista;
+            atual := lista^.prox;
             
-            while (atual <> nil) and (info > atual^.data) do
+            while (atual <> nil) and (info > atual^.info) do
             begin
                 anterior := atual;
-                atual := atual^.next;
+                atual := atual^.prox;
             end;
             
-            aux^.next := atual;
-            anterior^.next := aux;
+            aux^.prox := atual;
+            anterior^.prox := aux;
         end;
     end;
 end;
 
-procedure Remove(var list : TNode; info : TInfo);
+procedure Remove(var lista : TNode; info : TInfo);
 var anterior, atual : TNode;
 begin
-    if list = nil then
+    if lista = nil then
     begin
         write('List is empty!'); readkey;
     end
     else
     begin
         anterior := nil;
-        atual := list;
+        atual := lista;
         
-        while (atual <> nil) and (atual^.data <> info) do
+        while (atual <> nil) and (atual^.info <> info) do
         begin
             anterior := atual;
-            atual := atual^.next;
+            atual := atual^.prox;
         end;
         
         if atual = nil then
         begin
-            write('Element not found!'); readkey;
+            write('Elemento not found!'); readkey;
         end
         else
         begin
-            // Era o primeiro da lista?
+            // Era o primeiro da listaa?
             if anterior = nil then
-                list := atual^.next
+                lista := atual^.prox
             else
-                anterior^.next := atual^.next;
+                anterior^.prox := atual^.prox;
             
-            writeln('Element ', atual^.data, ' removed!');
+            writeln('Elemento ', atual^.info, ' removed!');
             dispose(atual);
             readkey;
         end;
     end;
 end;
 
-function CountElements(var list : TNode) : byte;
+function CountElementos(var lista : TNode) : byte;
 var aux : TNode;
     i : byte;
 begin
     i := 0;
     
-    if list <> nil then
+    if lista <> nil then
     begin
-        aux := list;
+        aux := lista;
         
         while aux <> nil do
         begin
             i := i + 1;
-            writeln(i, ' - ', aux^.data);
-            aux := aux^.next;
+            writeln(i, ' - ', aux^.info);
+            aux := aux^.prox;
         end
     end;
     
-    CountElements := i;
+    CountElementos := i;
 end;
 
 begin
     option := 1;
-    CreateList(str_list);
+    CreateList(str_lista);
     
     while option <> 0 do
     begin
         clrscr;
-        writeln ('0 - Exit');
-        writeln ('1 - Include');
-        writeln ('2 - Remove');
-        writeln ('3 - Count elements');
+        writeln ('0 - Sair');
+        writeln ('1 - Incluir');
+        writeln ('2 - Remover');
+        writeln ('3 - Countar elementos');
         readln (option);
         writeln;
        
@@ -137,18 +137,18 @@ begin
             1:
             begin
                 ReadInfo(str);
-                Include(str_list, str);
+                Include(str_lista, str);
             end;
             
             2:
             begin
                 ReadInfo(str);
-                Remove(str_list, str);
+                Remove(str_lista, str);
             end;
             
             3:
             begin
-                writeln(CountElements(str_list), ' elements');
+                writeln(CountElementos(str_lista), ' elements');
                 readkey;
             end;
         end;
