@@ -14,25 +14,25 @@ var option : byte;
     str : TInfo;
     str_lista : TNode;
 
-procedure ReadInfo(var info : TInfo);
+procedure LerInfo(var info : TInfo);
 begin
     clrscr;
-    write('Insert the info: ');
+    write('Insira informação: ');
     read(info);
 end;
 
-procedure CreateList(var lista : TNode);
+procedure CriarListaS(var lista : TNode);
 begin
     lista := nil;
 end;
 
-procedure Include(var lista : TNode; info : TInfo);
+procedure AdicionarS(var lista : TNode; info : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
     if aux = nil then
     begin
-        write('Memory full!'); readkey;
+        write('Memoria cheia!'); readkey;
     end
     else
     begin
@@ -61,12 +61,12 @@ begin
     end;
 end;
 
-procedure Remove(var lista : TNode; info : TInfo);
+procedure RemoverS(var lista : TNode; info : TInfo);
 var anterior, atual : TNode;
 begin
     if lista = nil then
     begin
-        write('List is empty!'); readkey;
+        write('Lista vazia!'); readkey;
     end
     else
     begin
@@ -81,7 +81,7 @@ begin
         
         if atual = nil then
         begin
-            write('Elemento not found!'); readkey;
+            write('Elemento não encontrado!'); readkey;
         end
         else
         begin
@@ -91,14 +91,14 @@ begin
             else
                 anterior^.prox := atual^.prox;
             
-            writeln('Elemento ', atual^.info, ' removed!');
+            writeln('Elemento ', atual^.info, ' removido!');
             dispose(atual);
             readkey;
         end;
     end;
 end;
 
-function CountElementos(var lista : TNode) : byte;
+function ContarListaS(var lista : TNode) : byte;
 var aux : TNode;
     i : byte;
 begin
@@ -116,12 +116,12 @@ begin
         end
     end;
     
-    CountElementos := i;
+    ContarListaS := i;
 end;
 
 begin
     option := 1;
-    CreateList(str_lista);
+    CriarListaS(str_lista);
     
     while option <> 0 do
     begin
@@ -129,26 +129,26 @@ begin
         writeln ('0 - Sair');
         writeln ('1 - Incluir');
         writeln ('2 - Remover');
-        writeln ('3 - Countar elementos');
+        writeln ('3 - Contar elementos');
         readln (option);
         writeln;
        
         case option of
             1:
             begin
-                ReadInfo(str);
-                Include(str_lista, str);
+                LerInfo(str);
+                AdicionarS(str_lista, str);
             end;
             
             2:
             begin
-                ReadInfo(str);
-                Remove(str_lista, str);
+                LerInfo(str);
+                RemoverS(str_lista, str);
             end;
             
             3:
             begin
-                writeln(CountElementos(str_lista), ' elements');
+                writeln(ContarListaS(str_lista), ' elementos');
                 readkey;
             end;
         end;
