@@ -21,12 +21,14 @@ begin
     read(info);
 end;
 
-procedure CriarListaS(var lista : TNode);
+// Lista Simples
+
+procedure CriarListaSimples(var lista : TNode);
 begin
     lista := nil;
 end;
 
-procedure AdicionarS(var lista : TNode; info : TInfo);
+procedure AdicionarSimples(var lista : TNode; info : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
@@ -61,7 +63,7 @@ begin
     end;
 end;
 
-procedure RemoverS(var lista : TNode; info : TInfo);
+procedure RemoverSimples(var lista : TNode; info : TInfo);
 var anterior, atual : TNode;
 begin
     if lista = nil then
@@ -98,7 +100,7 @@ begin
     end;
 end;
 
-function ContarListaS(var lista : TNode) : byte;
+function ContarListaSimples(var lista : TNode) : byte;
 var aux : TNode;
     i : byte;
 begin
@@ -118,6 +120,8 @@ begin
     
     ContarListaS := i;
 end;
+
+// lista dupla
 
 begin
     option := 1;
