@@ -6,26 +6,27 @@ type
     TInfo = string;
     TNode = ^TElemento;
     TElemento = record
-        ant : Tnode;
-        info : TInfo;
-        infoDois : TNode;
-        prox : TNode;
+        ant: Tnode;
+        infoUm: TInfo;
+        infoDois: TNode;
+        prox: TNode;
     end;
 
-var option : byte;
-    str : TInfo;
-    str_lista : TNode;
+var
+  opcao: byte;
+  str, strIngles: TInfo;
+  str_lista: TNode;
 
-procedure LerInfo(var info : TInfo);
+procedure LerInfo(var infoUm : TInfo);
 begin
     clrscr;
     write('Insira informação: ');
-    read(info);
+    read(infoUm);
 end;
 
 // Lista Simples
 
-procedure AdicionarSimples(var lista : TNode; info : TInfo);
+procedure AdicionarSimples(var lista : TNode; infoUm : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
@@ -35,10 +36,10 @@ begin
     end
     else
     begin
-        aux^.info := info;
+        aux^.infoUm := infoUm;
         aux^.prox := nil;
         
-        if (lista = nil) or (info < lista^.info) then
+        if (lista = nil) or (infoUm < lista^.infoUm) then
         begin
             aux^.prox := lista;
             lista := aux;
@@ -48,7 +49,7 @@ begin
             anterior := lista;
             atual := lista^.prox;
             
-            while (atual <> nil) and (info > atual^.info) do
+            while (atual <> nil) and (infoUm > atual^.infoUm) do
             begin
                 anterior := atual;
                 atual := atual^.prox;
@@ -60,7 +61,7 @@ begin
     end;
 end;
 
-procedure RemoverSimples(var lista : TNode; info : TInfo);
+procedure RemoverSimples(var lista : TNode; infoUm : TInfo);
 var anterior, atual : TNode;
 begin
     if lista = nil then
@@ -72,7 +73,7 @@ begin
         anterior := nil;
         atual := lista;
         
-        while (atual <> nil) and (atual^.info <> info) do
+        while (atual <> nil) and (atual^.infoUm <> infoUm) do
         begin
             anterior := atual;
             atual := atual^.prox;
@@ -90,7 +91,7 @@ begin
             else
                 anterior^.prox := atual^.prox;
             
-            writeln('Elemento ', atual^.info, ' removido!');
+            writeln('Elemento ', atual^.infoUm, ' removido!');
             dispose(atual);
             readkey;
         end;
@@ -103,7 +104,7 @@ begin
     lista := nil;
 end;
 
-procedure AdicionarDupla(var lista : TNode; info : TInfo);
+procedure AdicionarDupla(var lista : TNode; infoUm : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
@@ -113,10 +114,10 @@ begin
     end
     else
     begin
-        aux^.info := info;
+        aux^.infoUm := infoUm;
         aux^.prox := nil;
         
-        if (lista = nil) or (info < lista^.info) then
+        if (lista = nil) or (infoUm < lista^.infoUm) then
         begin
             aux^.prox := lista;
             lista := aux;
@@ -126,7 +127,7 @@ begin
             anterior := lista;
             atual := lista^.prox;
             
-            while (atual <> nil) and (info > atual^.info) do
+            while (atual <> nil) and (infoUm > atual^.infoUm) do
             begin
                 anterior := atual;
                 atual := atual^.prox;
@@ -138,7 +139,7 @@ begin
     end;
 end;
 
-procedure RemoverDupla(var lista : TNode; info : TInfo);
+procedure RemoverDupla(var lista : TNode; infoUm : TInfo);
 var anterior, atual : TNode;
 begin
     if lista = nil then
@@ -150,7 +151,7 @@ begin
         anterior := nil;
         atual := lista;
         
-        while (atual <> nil) and (atual^.info <> info) do
+        while (atual <> nil) and (atual^.infoUm <> infoUm) do
         begin
             anterior := atual;
             atual := atual^.prox;
@@ -168,7 +169,7 @@ begin
             else
                 anterior^.prox := atual^.prox;
             
-            writeln('Elemento ', atual^.info, ' removido!');
+            writeln('Elemento ', atual^.infoUm, ' removido!');
             dispose(atual);
             readkey;
         end;
@@ -176,30 +177,27 @@ begin
 end;
 
 begin
-    option := 1;
-    CriarListaDupla(str_lista);
-    
+    opcao := 1;
+    Dupla(str_lista);
+
     while option <> 0 do
     begin
         clrscr;
-        writeln ('0 - Sair');
-        writeln ('1 - Incluir');
-        writeln ('2 - Remover');
-        readln (option);
+        writeln('0 - Sair');
+        writeln('1 - Incluir palavra-chave');
+        writeln('2 - Incluir no dicionario');
+        writeln('3 - Remover do dicionario');
+        writeln('4 - Consultar');
+        writeln('5 - Escrever todo o dicionario');
+        readln(option);
         writeln;
-       
+
         case option of
-            1:
-            begin
-                LerInfo(str);
-                AdicionarSimples(str_lista, str);
-            end;
-            
-            2:
-            begin
-                LerInfo(str);
-                RemoverSimples(str_lista, str);
-            end;
+            1: writeln('em breve...');
+            2: writeln('em breve...');
+            3: writeln('em breve...');
+            4: writeln('em breve...');
+            5: writeln('em breve...');
         end;
     end;
 end.
