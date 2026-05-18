@@ -6,7 +6,9 @@ type
     TInfo = string;
     TNode = ^TElemento;
     TElemento = record
+        ant : Tnode;
         info : TInfo;
+        infoDois : TNode
         prox : TNode;
     end;
 
@@ -23,11 +25,6 @@ end;
 
 // Lista Simples
 
-procedure CriarListaSimples(var lista : TNode);
-begin
-    lista := nil;
-end;
-
 procedure AdicionarSimples(var lista : TNode; info : TInfo);
 var aux, anterior, atual : TNode;
 begin
@@ -98,36 +95,15 @@ begin
             readkey;
         end;
     end;
-end;
-
-function ContarListaSimples(var lista : TNode) : byte;
-var aux : TNode;
-    i : byte;
-begin
-    i := 0;
-    
-    if lista <> nil then
-    begin
-        aux := lista;
-        
-        while aux <> nil do
-        begin
-            i := i + 1;
-            writeln(i, ' - ', aux^.info);
-            aux := aux^.prox;
-        end
-    end;
-    
-    ContarListaS := i;
 end;
 
 // lista dupla
-procedure CriarListaSimples(var lista : TNode);
+procedure Dupla(var lista : TNode);
 begin
     lista := nil;
 end;
 
-procedure AdicionarSimples(var lista : TNode; info : TInfo);
+procedure AdicionarDupla(var lista : TNode; info : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
@@ -162,7 +138,7 @@ begin
     end;
 end;
 
-procedure RemoverSimples(var lista : TNode; info : TInfo);
+procedure RemoverDupla(var lista : TNode; info : TInfo);
 var anterior, atual : TNode;
 begin
     if lista = nil then
@@ -197,32 +173,11 @@ begin
             readkey;
         end;
     end;
-end;
-
-function ContarListaSimples(var lista : TNode) : byte;
-var aux : TNode;
-    i : byte;
-begin
-    i := 0;
-    
-    if lista <> nil then
-    begin
-        aux := lista;
-        
-        while aux <> nil do
-        begin
-            i := i + 1;
-            writeln(i, ' - ', aux^.info);
-            aux := aux^.prox;
-        end
-    end;
-    
-    ContarListaS := i;
 end;
 
 begin
     option := 1;
-    CriarListaS(str_lista);
+    CriarListaDupla(str_lista);
     
     while option <> 0 do
     begin
@@ -238,18 +193,18 @@ begin
             1:
             begin
                 LerInfo(str);
-                AdicionarS(str_lista, str);
+                AdicionarSimples(str_lista, str);
             end;
             
             2:
             begin
                 LerInfo(str);
-                RemoverS(str_lista, str);
+                RemoverSimples(str_lista, str);
             end;
             
             3:
             begin
-                writeln(ContarListaS(str_lista), ' elementos');
+                writeln(ContarListaSimples(str_lista), ' elementos');
                 readkey;
             end;
         end;
