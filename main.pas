@@ -8,7 +8,7 @@ type
     TElemento = record
         ant : Tnode;
         info : TInfo;
-        infoDois : TNode
+        infoDois : TNode;
         prox : TNode;
     end;
 
@@ -98,7 +98,7 @@ begin
 end;
 
 // lista dupla
-procedure Dupla(var lista : TNode);
+procedure CriarListaDupla(var lista : TNode);
 begin
     lista := nil;
 end;
@@ -185,7 +185,6 @@ begin
         writeln ('0 - Sair');
         writeln ('1 - Incluir');
         writeln ('2 - Remover');
-        writeln ('3 - Contar elementos');
         readln (option);
         writeln;
        
@@ -200,12 +199,6 @@ begin
             begin
                 LerInfo(str);
                 RemoverSimples(str_lista, str);
-            end;
-            
-            3:
-            begin
-                writeln(ContarListaSimples(str_lista), ' elementos');
-                readkey;
             end;
         end;
     end;
