@@ -37,22 +37,10 @@ type
   end;
 
 var
-  option    : byte;
-  str, strEN: TInfo;
-  str_lista : TNode;
-
-{ =========================================================
-    AUXILIAR
-  ========================================================= }
-
-function Min(s: string): string;
-var i: integer;
-begin
-  for i := 1 to Length(s) do
-    if s[i] in ['A'..'Z'] then
-      s[i] := Chr(Ord(s[i]) + 32);
-  Min := s;
-end;
+  opcao         : byte;
+  entradaPT     : TInfo;
+  entradaEN     : TInfo;
+  listaPrincipal: TNode;
 
 { =========================================================
     LISTA PRINCIPAL — duplo encadeamento
@@ -63,16 +51,18 @@ begin
   lista := nil;
 end;
 
-procedure AdicionarChave(var lista: TNode; info: TInfo);
+procedure AdicionarChave(var lista: TNode; chave: TInfo);
 var
-  aux, anterior, atual: TNode;
-  existe: boolean;
+  novoNo  : TNode;
+  anterior: TNode;
+  atual   : TNode;
+  existe  : boolean;
 begin
   atual  := lista;
   existe := false;
   while (atual <> nil) and (not existe) do
   begin
-    if Min(atual^.portugues) = Min(info) then
+    if atual^.portugues = chave then
       existe := true
     else
       atual := atual^.prox;
@@ -80,48 +70,48 @@ begin
 
   if existe then
   begin
-    writeln('>>> Chave "', info, '" ja existe!'); readkey;
+    writeln('>>> Chave "', chave, '" ja existe!'); readkey;
   end
   else
   begin
-    new(aux);
-    if aux = nil then
+    new(novoNo);
+    if novoNo = nil then
     begin
       writeln('Memoria cheia!'); readkey;
     end
     else
     begin
-      aux^.portugues := info;
-      aux^.infoDois  := nil;
-      aux^.prox      := nil;
-      aux^.ant       := nil;
+      novoNo^.portugues := chave;
+      novoNo^.infoDois  := nil;
+      novoNo^.prox      := nil;
+      novoNo^.ant       := nil;
 
-      if (lista = nil) or (Min(info) < Min(lista^.portugues)) then
+      if (lista = nil) or (chave < lista^.portugues) then
       begin
-        aux^.prox := lista;
+        novoNo^.prox := lista;
         if lista <> nil then
-          lista^.ant := aux;
-        lista := aux;
+          lista^.ant := novoNo;
+        lista := novoNo;
       end
       else
       begin
         anterior := lista;
         atual    := lista^.prox;
 
-        while (atual <> nil) and (Min(info) > Min(atual^.portugues)) do
+        while (atual <> nil) and (chave > atual^.portugues) do
         begin
           anterior := atual;
           atual    := atual^.prox;
         end;
 
-        aux^.prox      := atual;
-        aux^.ant       := anterior;
-        anterior^.prox := aux;
+        novoNo^.prox      := atual;
+        novoNo^.ant       := anterior;
+        anterior^.prox    := novoNo;
         if atual <> nil then
-          atual^.ant := aux;
+          atual^.ant := novoNo;
       end;
 
-      writeln('>>> Chave "', info, '" inserida.'); readkey;
+      writeln('>>> Chave "', chave, '" inserida.'); readkey;
     end;
   end;
 end;
@@ -131,7 +121,7 @@ end;
     Regra: verbete entra no 1o nó cuja chave > verbete
   ========================================================= }
 
-function BuscarNo(lista: TNode; verbete: TInfo): TNode;
+function BuscarNoCorreto(lista: TNode; verbete: TInfo): TNode;
 var
   atual     : TNode;
   encontrado: boolean;
@@ -140,38 +130,40 @@ begin
   encontrado := false;
   while (atual <> nil) and (not encontrado) do
   begin
-    if Min(atual^.portugues) > Min(verbete) then
+    if atual^.portugues > verbete then
       encontrado := true
     else
       atual := atual^.prox;
   end;
   if encontrado then
-    BuscarNo := atual
+    BuscarNoCorreto := atual
   else
-    BuscarNo := nil;
+    BuscarNoCorreto := nil;
 end;
 
-procedure AdicionarVerbete(var lista: TNode; ptBR, ptEN: TInfo);
+procedure AdicionarVerbete(var lista: TNode; verbetePT, verbeteEN: TInfo);
 var
-  no        : TNode;
-  aux, noEN : TNode;
-  ant, atual: TNode;
-  existe    : boolean;
+  noCorreto   : TNode;
+  noVerbete   : TNode;
+  noTraducao  : TNode;
+  anterior    : TNode;
+  atual       : TNode;
+  existe      : boolean;
 begin
-  no := BuscarNo(lista, ptBR);
+  noCorreto := BuscarNoCorreto(lista, verbetePT);
 
-  if no = nil then
+  if noCorreto = nil then
   begin
-    writeln('>>> Nao ha chave maior que "', ptBR,
+    writeln('>>> Nao ha chave maior que "', verbetePT,
             '". Cadastre uma palavra-chave primeiro.'); readkey;
   end
   else
   begin
-    atual  := no^.infoDois;
+    atual  := noCorreto^.infoDois;
     existe := false;
     while (atual <> nil) and (not existe) do
     begin
-      if Min(atual^.portugues) = Min(ptBR) then
+      if atual^.portugues = verbetePT then
         existe := true
       else
         atual := atual^.prox;
@@ -179,135 +171,136 @@ begin
 
     if existe then
     begin
-      writeln('>>> "', ptBR, '" ja existe no grupo de "', no^.portugues, '"!');
-      readkey;
+      writeln('>>> "', verbetePT, '" ja existe no grupo de "',
+              noCorreto^.portugues, '"!'); readkey;
     end
     else
     begin
-      { Nó de tradução (C): portugues = inglês, resto nil }
-      new(noEN);
-      if noEN = nil then
+      { Nó de tradução (C): armazena o inglês no campo portugues }
+      new(noTraducao);
+      if noTraducao = nil then
       begin
         writeln('Memoria cheia!'); readkey;
       end
       else
       begin
-        noEN^.portugues := ptEN;
-        noEN^.ant       := nil;
-        noEN^.infoDois  := nil;
-        noEN^.prox      := nil;
+        noTraducao^.portugues := verbeteEN;
+        noTraducao^.ant       := nil;
+        noTraducao^.infoDois  := nil;
+        noTraducao^.prox      := nil;
 
         { Nó do verbete PT (B) }
-        new(aux);
-        if aux = nil then
+        new(noVerbete);
+        if noVerbete = nil then
         begin
-          dispose(noEN);
+          dispose(noTraducao);
           writeln('Memoria cheia!'); readkey;
         end
         else
         begin
-          aux^.portugues := ptBR;
-          aux^.infoDois  := noEN;
-          aux^.ant       := nil;
-          aux^.prox      := nil;
+          noVerbete^.portugues := verbetePT;
+          noVerbete^.infoDois  := noTraducao;
+          noVerbete^.ant       := nil;
+          noVerbete^.prox      := nil;
 
-          if (no^.infoDois = nil) or
-             (Min(ptBR) < Min(no^.infoDois^.portugues)) then
+          if (noCorreto^.infoDois = nil) or
+             (verbetePT < noCorreto^.infoDois^.portugues) then
           begin
-            aux^.prox    := no^.infoDois;
-            no^.infoDois := aux;
+            noVerbete^.prox    := noCorreto^.infoDois;
+            noCorreto^.infoDois := noVerbete;
           end
           else
           begin
-            ant   := no^.infoDois;
-            atual := no^.infoDois^.prox;
+            anterior := noCorreto^.infoDois;
+            atual    := noCorreto^.infoDois^.prox;
 
-            while (atual <> nil) and (Min(ptBR) > Min(atual^.portugues)) do
+            while (atual <> nil) and (verbetePT > atual^.portugues) do
             begin
-              ant   := atual;
-              atual := atual^.prox;
+              anterior := atual;
+              atual    := atual^.prox;
             end;
 
-            aux^.prox := atual;
-            ant^.prox := aux;
+            noVerbete^.prox := atual;
+            anterior^.prox  := noVerbete;
           end;
 
-          writeln('>>> "', ptBR, ' -> ', ptEN,
-                  '" inserido no grupo de "', no^.portugues, '".'); readkey;
+          writeln('>>> "', verbetePT, ' -> ', verbeteEN,
+                  '" inserido no grupo de "', noCorreto^.portugues, '".'); readkey;
         end;
       end;
     end;
   end;
 end;
 
-procedure RemoverVerbete(var lista: TNode; ptBR: TInfo);
+procedure RemoverVerbete(var lista: TNode; verbetePT: TInfo);
 var
-  no        : TNode;
-  ant, atual: TNode;
+  noCorreto: TNode;
+  anterior : TNode;
+  atual    : TNode;
   encontrado: boolean;
 begin
-  no := BuscarNo(lista, ptBR);
+  noCorreto := BuscarNoCorreto(lista, verbetePT);
 
-  if no = nil then
+  if noCorreto = nil then
   begin
-    writeln('>>> Nenhum grupo encontrado para "', ptBR, '".'); readkey;
+    writeln('>>> Nenhum grupo encontrado para "', verbetePT, '".'); readkey;
   end
   else
   begin
-    ant        := nil;
-    atual      := no^.infoDois;
+    anterior   := nil;
+    atual      := noCorreto^.infoDois;
     encontrado := false;
 
     while (atual <> nil) and (not encontrado) do
     begin
-      if Min(atual^.portugues) = Min(ptBR) then
+      if atual^.portugues = verbetePT then
         encontrado := true
       else
       begin
-        ant   := atual;
-        atual := atual^.prox;
+        anterior := atual;
+        atual    := atual^.prox;
       end;
     end;
 
     if not encontrado then
     begin
-      writeln('>>> "', ptBR, '" nao encontrado no grupo de "',
-              no^.portugues, '".'); readkey;
+      writeln('>>> "', verbetePT, '" nao encontrado no grupo de "',
+              noCorreto^.portugues, '".'); readkey;
     end
     else
     begin
-      if ant = nil then
-        no^.infoDois := atual^.prox
+      if anterior = nil then
+        noCorreto^.infoDois := atual^.prox
       else
-        ant^.prox := atual^.prox;
+        anterior^.prox := atual^.prox;
 
-      dispose(atual^.infoDois);   { libera nó de tradução }
-      dispose(atual);             { libera nó PT           }
-      writeln('>>> "', ptBR, '" removido do grupo de "', no^.portugues, '".');
-      readkey;
+      dispose(atual^.infoDois);
+      dispose(atual);
+      writeln('>>> "', verbetePT, '" removido do grupo de "',
+              noCorreto^.portugues, '".'); readkey;
     end;
   end;
 end;
 
-procedure Consultar(lista: TNode; ptBR: TInfo);
+procedure Consultar(lista: TNode; verbetePT: TInfo);
 var
-  no        : TNode;
+  noCorreto : TNode;
   atual     : TNode;
   encontrado: boolean;
 begin
-  no := BuscarNo(lista, ptBR);
+  noCorreto := BuscarNoCorreto(lista, verbetePT);
 
-  if no = nil then
+  if noCorreto = nil then
   begin
-    writeln('>>> Nenhum grupo encontrado para "', ptBR, '".'); readkey;
+    writeln('>>> Nenhum grupo encontrado para "', verbetePT, '".'); readkey;
   end
   else
   begin
-    atual      := no^.infoDois;
+    atual      := noCorreto^.infoDois;
     encontrado := false;
     while (atual <> nil) and (not encontrado) do
     begin
-      if Min(atual^.portugues) = Min(ptBR) then
+      if atual^.portugues = verbetePT then
         encontrado := true
       else
         atual := atual^.prox;
@@ -315,14 +308,14 @@ begin
 
     if not encontrado then
     begin
-      writeln('>>> "', ptBR, '" nao cadastrado.'); readkey;
+      writeln('>>> "', verbetePT, '" nao cadastrado.'); readkey;
     end
     else
     begin
       writeln('----------------------------------------');
       writeln('  [PT] ', atual^.portugues,
               '  ->  [EN] ', atual^.infoDois^.portugues);
-      writeln('  (grupo: ', no^.portugues, ')');
+      writeln('  (grupo: ', noCorreto^.portugues, ')');
       writeln('----------------------------------------');
       readkey;
     end;
@@ -331,8 +324,8 @@ end;
 
 procedure EscreverTudo(lista: TNode);
 var
-  no     : TNode;
-  verbete: TNode;
+  noAtual : TNode;
+  verbete : TNode;
 begin
   clrscr;
   if lista = nil then
@@ -344,11 +337,11 @@ begin
     writeln('========================================');
     writeln('      DICIONARIO PORTUGUES - INGLES     ');
     writeln('========================================');
-    no := lista;
-    while no <> nil do
+    noAtual := lista;
+    while noAtual <> nil do
     begin
-      writeln('[ ', no^.portugues, ' ]');
-      verbete := no^.infoDois;
+      writeln('[ ', noAtual^.portugues, ' ]');
+      verbete := noAtual^.infoDois;
       if verbete = nil then
         writeln('  (sem verbetes)')
       else
@@ -360,7 +353,7 @@ begin
           verbete := verbete^.prox;
         end;
       end;
-      no := no^.prox;
+      noAtual := noAtual^.prox;
     end;
     writeln('========================================');
     readkey;
@@ -371,10 +364,10 @@ end;
     PROGRAMA PRINCIPAL
   ========================================================= }
 begin
-  option := 1;
-  CriarLista(str_lista);
+  opcao := 1;
+  CriarLista(listaPrincipal);
 
-  while option <> 0 do
+  while opcao <> 0 do
   begin
     clrscr;
     writeln('========================================');
@@ -388,45 +381,45 @@ begin
     writeln(' 5 - Escrever todo o dicionario');
     writeln('========================================');
     write('Opcao: ');
-    readln(option);
+    readln(opcao);
     writeln;
 
-    case option of
+    case opcao of
       1:
       begin
         clrscr;
         write('Palavra-chave: ');
-        readln(str);
-        AdicionarChave(str_lista, str);
+        readln(entradaPT);
+        AdicionarChave(listaPrincipal, entradaPT);
       end;
 
       2:
       begin
         clrscr;
         write('Verbete em portugues: ');
-        readln(str);
+        readln(entradaPT);
         write('Traducao em ingles  : ');
-        readln(strEN);
-        AdicionarVerbete(str_lista, str, strEN);
+        readln(entradaEN);
+        AdicionarVerbete(listaPrincipal, entradaPT, entradaEN);
       end;
 
       3:
       begin
         clrscr;
         write('Verbete a remover: ');
-        readln(str);
-        RemoverVerbete(str_lista, str);
+        readln(entradaPT);
+        RemoverVerbete(listaPrincipal, entradaPT);
       end;
 
       4:
       begin
         clrscr;
         write('Verbete a consultar: ');
-        readln(str);
-        Consultar(str_lista, str);
+        readln(entradaPT);
+        Consultar(listaPrincipal, entradaPT);
       end;
 
-      5: EscreverTudo(str_lista);
+      5: EscreverTudo(listaPrincipal);
     end;
   end;
 
