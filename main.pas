@@ -24,6 +24,27 @@ begin
     read(infoUm);
 end;
 
+function BuscarNo(lista: TNode; valor: TInfo): TNode;
+var atual: TNode;
+    encontrado: boolean;
+begin
+    atual := lista;
+    encontrado := false;
+
+    while (atual <> nil) and (not encontrado) do
+    begin
+        if atual^.infoUm = valor then
+            encontrado := true
+        else
+            atual := atual^.prox;
+    end;
+
+    if encontrado then
+        BuscarNo := atual
+    else
+        BuscarNo := nil;
+end;
+
 // Lista Simples
 
 procedure AdicionarSimples(var lista : TNode; infoUm : TInfo);
@@ -187,23 +208,11 @@ begin
 end;
 
 procedure InserirChave(var lista: TNode; chave:TInfo);
-var atual: TNode;
-    existe: boolean;
 begin
-    atual := lista;
-    existe := false;
-
-    while(atual <> nil) and (not existe) do
+    if BuscarNo(lista, chave) <> nil then
     begin
-        if atual^.infoUm = chave then
-            existe := true
-        else
-            atual := atual^.prox;
-    end;
-
-    if existe then
-    begin
-        writeln('Chave "', chave, '" ja existe!'); readkey;
+        writeln('Chave "', chave, '" ja existe!');
+        readkey;
     end
     else
         AdicionarDupla(lista, chave);
@@ -223,9 +232,79 @@ begin
         else
             atual := atual^.prox;
     end;
+
+    if encontrado then
+        BuscarNoCerto := atual
+    else
+        BuscarNoCerto := nil;
 end;
 
+procedure InserirVerbete(var lista: TNode; verbetePT, verbeteEN: TInfo);
+var noCerto, noVerbete, noTraducao, anterior, atual: TNode;
+begin
+    noCerto := BuscarNoCerto(lista, verbetePT);
 
+    if noCerto = nil then
+    begin
+        writeln('Ainda não há uma chave válida para "', 
+            verbetePT, '", cadastre uma chave válida primeiro!');
+        readkey;
+    end
+    else
+    begin
+        if BuscarNo(noCerto^.infoDois, verbetePT) <> nil then
+        begin
+            writeln('"', verbetePT, '" ja existe no grupo de "',
+                noCerto^.infoUm, '"!');
+            readkey;
+        end
+        else
+        begin
+            //noTraducao guarda valor em inglês
+            new(noTraducao);
+            noTraducao^.ant := nil;
+            noTraducao^.infoUm := verbeteEN;
+            noTraducao^.infoDois := nil;
+            noTraducao^.prox := nil;
+
+            //noVerbete guarda valor em português
+            new(noVerbete);
+            noVerbete^.ant := nil;
+            noVerbete^.infoUm := verbetePT;
+            noVerbete^.infoDois := noTraducao;
+            noVerbete^.prox := nil;
+
+            noTraducao^.infoDois := noVerbete;
+
+            if (noCerto^.infoDois = nil) or 
+                (verbetePT < noCerto^.infoDois^.infoUm) then
+            begin
+                noVerbete^.prox := noCerto^.infoDois;
+                noCerto^.infoDois := noVerbete;
+            end
+            else
+            begin
+                anterior := noCerto^.infoDois;
+                atual := noCerto^.infoDois^.prox
+
+                while (atual <> nil) and (verbetePT > atual^.infoUm) do
+                begin
+                    anterior := atual;
+                    atual := atual^.prox;
+                end;
+
+                noVerbete^.prox := atual;
+                anterior^.prox := noVerbete;
+            end;
+
+            writeln('"', verbetePT, ' -> ', verbeteEN,
+                '" inserido no grupo de "', noCorreto^.infoUm, '".');
+            readkey;
+        end;
+    end;
+
+
+end;
 
 begin
     opcao := 1;
@@ -250,7 +329,16 @@ begin
                 readln(str);
                 InserirChave(str_lista, str);
             end;
-            2: writeln('em breve...');
+
+            2: begin
+                clrscr;
+                write('Verbete em portugues: ');
+                readln(str);
+                write('Traducao em ingles  : ');
+                readln(strIngles);
+                InserirVerbete(str_lista, str, strIngles);
+            end;
+            
             3: writeln('em breve...');
             4: writeln('em breve...');
             5: writeln('em breve...');
