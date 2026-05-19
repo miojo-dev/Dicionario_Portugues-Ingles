@@ -206,7 +206,7 @@ begin
         writeln('Chave "', chave, '" ja existe!'); readkey;
     end
     else
-        AdicionarDupla(str_lista, chave);
+        AdicionarDupla(lista, chave);
 end;
 
 begin
