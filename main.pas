@@ -13,9 +13,9 @@ type
     end;
 
 var
-  opcao: byte;
-  str, strIngles: TInfo;
-  str_lista: TNode;
+    opcao: byte;
+    str, strIngles: TInfo;
+    str_lista: TNode;
 
 procedure LerInfo(var infoUm : TInfo);
 begin
@@ -108,18 +108,25 @@ procedure AdicionarDupla(var lista : TNode; infoUm : TInfo);
 var aux, anterior, atual : TNode;
 begin
     new(aux);
+
     if aux = nil then
     begin
         write('Memoria cheia!'); readkey;
     end
     else
     begin
+        aux^.ant := nil;
         aux^.infoUm := infoUm;
+        aux^.infoDois := nil;
         aux^.prox := nil;
         
         if (lista = nil) or (infoUm < lista^.infoUm) then
         begin
             aux^.prox := lista;
+
+            if lista <> nil then
+                lista^.ant := aux;
+            
             lista := aux;
         end
         else
@@ -134,7 +141,10 @@ begin
             end;
             
             aux^.prox := atual;
+            aux^.ant := anterior;
             anterior^.prox := aux;
+            if atual <> nil then
+                atual^.ant := aux;
         end;
     end;
 end;
@@ -176,6 +186,29 @@ begin
     end;
 end;
 
+procedure InserirChave(var lista: TNode; chave:TInfo);
+var atual: TNode;
+    existe: boolean;
+begin
+    atual := lista;
+    existe := false;
+
+    while(atual <> nil) and (not existe) do
+    begin
+        if atual^.infoUm = chave then
+            existe := true
+        else
+            atual := atual^.prox;
+    end;
+
+    if existe then
+    begin
+        writeln('Chave "', chave, '" ja existe!'); readkey;
+    end
+    else
+        AdicionarDupla(str_lista, chave);
+end;
+
 begin
     opcao := 1;
     CriarListaDupla(str_lista);
@@ -193,7 +226,12 @@ begin
         writeln;
 
         case opcao of
-            1: writeln('em breve...');
+            1: begin
+                clrscr;
+                write('Palavra-chave: ');
+                readln(str);
+                InserirChave(str_lista, str);
+            end;
             2: writeln('em breve...');
             3: writeln('em breve...');
             4: writeln('em breve...');
