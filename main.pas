@@ -178,9 +178,9 @@ end;
 
 begin
     opcao := 1;
-    Dupla(str_lista);
+    CriarListaDupla(str_lista);
 
-    while option <> 0 do
+    while opcao <> 0 do
     begin
         clrscr;
         writeln('0 - Sair');
@@ -189,10 +189,10 @@ begin
         writeln('3 - Remover do dicionario');
         writeln('4 - Consultar');
         writeln('5 - Escrever todo o dicionario');
-        readln(option);
+        readln(opcao);
         writeln;
 
-        case option of
+        case opcao of
             1: writeln('em breve...');
             2: writeln('em breve...');
             3: writeln('em breve...');
