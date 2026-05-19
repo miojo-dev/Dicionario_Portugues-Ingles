@@ -209,6 +209,24 @@ begin
         AdicionarDupla(lista, chave);
 end;
 
+function BuscarNoCerto(lista: TNode; verbete: TInfo): TNode;
+var atual: TNode;
+    encontrado: boolean;
+begin
+    atual := lista;
+    encontrado := false;
+
+    while(atual <> nil) and (not encontrado) do
+    begin
+        if atual^.infoUm > verbete then
+            encontrado := true
+        else
+            atual := atual^.prox;
+    end;
+end;
+
+
+
 begin
     opcao := 1;
     CriarListaDupla(str_lista);
