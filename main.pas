@@ -17,13 +17,6 @@ var
     str, strIngles: TInfo;
     str_lista: TNode;
 
-procedure LerInfo(var infoUm : TInfo);
-begin
-    clrscr;
-    write('Insira informação: ');
-    read(infoUm);
-end;
-
 function BuscarNo(lista: TNode; valor: TInfo): TNode;
 var atual: TNode;
     encontrado: boolean;
@@ -45,81 +38,6 @@ begin
         BuscarNo := nil;
 end;
 
-// Lista Simples
-
-procedure AdicionarSimples(var lista : TNode; infoUm : TInfo);
-var aux, anterior, atual : TNode;
-begin
-    new(aux);
-    if aux = nil then
-    begin
-        write('Memoria cheia!'); readkey;
-    end
-    else
-    begin
-        aux^.infoUm := infoUm;
-        aux^.prox := nil;
-        
-        if (lista = nil) or (infoUm < lista^.infoUm) then
-        begin
-            aux^.prox := lista;
-            lista := aux;
-        end
-        else
-        begin
-            anterior := lista;
-            atual := lista^.prox;
-            
-            while (atual <> nil) and (infoUm > atual^.infoUm) do
-            begin
-                anterior := atual;
-                atual := atual^.prox;
-            end;
-            
-            aux^.prox := atual;
-            anterior^.prox := aux;
-        end;
-    end;
-end;
-
-procedure RemoverSimples(var lista : TNode; infoUm : TInfo);
-var anterior, atual : TNode;
-begin
-    if lista = nil then
-    begin
-        write('Lista vazia!'); readkey;
-    end
-    else
-    begin
-        anterior := nil;
-        atual := lista;
-        
-        while (atual <> nil) and (atual^.infoUm <> infoUm) do
-        begin
-            anterior := atual;
-            atual := atual^.prox;
-        end;
-        
-        if atual = nil then
-        begin
-            write('Elemento não encontrado!'); readkey;
-        end
-        else
-        begin
-            // Era o primeiro da listaa?
-            if anterior = nil then
-                lista := atual^.prox
-            else
-                anterior^.prox := atual^.prox;
-            
-            writeln('Elemento ', atual^.infoUm, ' removido!');
-            dispose(atual);
-            readkey;
-        end;
-    end;
-end;
-
-// lista dupla
 procedure CriarListaDupla(var lista : TNode);
 begin
     lista := nil;
@@ -171,7 +89,7 @@ begin
 end;
 
 procedure RemoverDupla(var lista : TNode; infoUm : TInfo);
-var anterior, atual : TNode;
+var noCerto : TNode;
 begin
     if lista = nil then
     begin
@@ -179,29 +97,25 @@ begin
     end
     else
     begin
-        anterior := nil;
-        atual := lista;
+        noCerto := BuscarNo(lista, infoUm);
         
-        while (atual <> nil) and (atual^.infoUm <> infoUm) do
+        if noCerto = nil then
         begin
-            anterior := atual;
-            atual := atual^.prox;
-        end;
-        
-        if atual = nil then
-        begin
-            write('Elemento não encontrado!'); readkey;
+            write('Elemento não encontrado!');
+            readkey;
         end
         else
         begin
-            // Era o primeiro da listaa?
-            if anterior = nil then
-                lista := atual^.prox
+            if noCerto^.ant = nil then
+                lista := noCerto^.prox
             else
-                anterior^.prox := atual^.prox;
+                noCerto^.ant^.prox := noCerto^.prox;
+                
+            if noCerto^.prox <> nil then
+                noCerto^.prox^.ant := noCerto^.ant;
             
-            writeln('Elemento ', atual^.infoUm, ' removido!');
-            dispose(atual);
+            writeln('Elemento ', noCerto^.infoUm, ' removido!');
+            dispose(noCerto);
             readkey;
         end;
     end;
