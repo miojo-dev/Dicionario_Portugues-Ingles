@@ -285,7 +285,7 @@ begin
             else
             begin
                 anterior := noCerto^.infoDois;
-                atual := noCerto^.infoDois^.prox
+                atual := noCerto^.infoDois^.prox;
 
                 while (atual <> nil) and (verbetePT > atual^.infoUm) do
                 begin
@@ -298,12 +298,54 @@ begin
             end;
 
             writeln('"', verbetePT, ' -> ', verbeteEN,
-                '" inserido no grupo de "', noCorreto^.infoUm, '".');
+                '" inserido no grupo de "', noCerto^.infoUm, '".');
             readkey;
         end;
     end;
+end;
 
-
+procedure RemoverVerbete(var lista: TNode; verbetePT:TInfo);
+var noCerto, anterior, atual: TNode;
+begin
+    noCerto := BuscarNoCerto(lista, verbetePT);
+    
+    if noCerto = nil then
+    begin
+        writeln('Nenhum grupo encontrado para "', verbetePT, '"!');
+        readkey;
+    end
+    else
+    begin
+        anterior := nil;
+        atual := noCerto^.infoDois;
+        
+        while (atual <> nil) and (atual^.infoUm <> verbetePT) do
+        begin
+            anterior := atual;
+            atual := atual^.prox;
+        end;
+        
+        if atual = nil then
+        begin
+            writeln('"', verbetePT, '" nao encontrado no grupo de "',
+                noCerto^.infoUm, '"');
+            readkey;
+        end
+        else
+        begin
+            if anterior = nil then
+                noCerto^.infoDois := atual^.prox
+            else
+                anterior^.prox := atual^.prox;
+            
+            dispose(atual^.infoDois);
+            dispose(atual);
+            
+            writeln('"', verbetePT, '" removido do grupo de "',
+                noCerto^.infoUm, '"');
+            readkey;
+        end;
+    end;
 end;
 
 begin
@@ -339,7 +381,12 @@ begin
                 InserirVerbete(str_lista, str, strIngles);
             end;
             
-            3: writeln('em breve...');
+            3: begin
+                clrscr;
+                write('Digite o verbete a ser removido: ');
+                readln(str);
+                RemoverVerbete(str_lista, str);
+            end;
             4: writeln('em breve...');
             5: writeln('em breve...');
         end;
