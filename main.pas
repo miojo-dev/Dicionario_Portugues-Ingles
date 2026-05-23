@@ -262,6 +262,36 @@ begin
     end;
 end;
 
+procedure Consultar(lista: Tnode; verbetePT: TInfo);
+var noCerto, noVerbete: TNode;
+begin
+    noCerto := BuscarNoCerto(lista, verbetePT);
+    
+    if noCerto = nil then
+    begin
+        writeln('"', verbetePT, '" nao encontrado!');
+        readkey;
+    end
+    else
+    begin
+        noVerbete := BuscarNo(noCerto^.infoDois, verbetePT);
+        
+        if noVerbete = nil then
+        begin
+            writeln('"', verbetePT, '" nao encontrado no grupo de "',
+                noCerto^.infoUm, '"!');
+            readkey;
+        end
+        else
+        begin
+            writeln('[PT] ', noVerbete^.infoUm,
+                    ' -> [EN] ', noVerbete^.infoDois^.infoUm);
+            writeln('(grupo: ', noCerto^.infoUm, ')');
+            readkey;
+        end;
+    end
+end;
+
 begin
     opcao := 1;
     CriarListaDupla(str_lista);
@@ -281,16 +311,16 @@ begin
         case opcao of
             1: begin
                 clrscr;
-                write('Palavra-chave: ');
+                write('Digite sua palavra-chave: ');
                 readln(str);
                 InserirChave(str_lista, str);
             end;
 
             2: begin
                 clrscr;
-                write('Verbete em portugues: ');
+                write('Insira o verbete em portugues: ');
                 readln(str);
-                write('Traducao em ingles  : ');
+                write('Insira a traducao em ingles  : ');
                 readln(strIngles);
                 InserirVerbete(str_lista, str, strIngles);
             end;
@@ -301,7 +331,14 @@ begin
                 readln(str);
                 RemoverVerbete(str_lista, str);
             end;
-            4: writeln('em breve...');
+            
+            4: begin
+                clrscr;
+                write('Insira o verbete a ser consultado: ');
+                readln(str);
+                Consultar(str_lista, str);
+            end;
+            
             5: writeln('em breve...');
         end;
     end;
