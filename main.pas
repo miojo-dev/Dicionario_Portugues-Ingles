@@ -292,6 +292,40 @@ begin
     end
 end;
 
+procedure EscreveTudo(lista: TNode);
+var noAtual, verbete: TNode;
+begin
+    if lista = nil then
+    begin
+        writeln('Dicionário vazio!');
+        readkey;
+    end
+    else
+    begin
+        noAtual := lista;
+        
+        while noAtual <> nil do
+        begin
+            writeln('[ ', noAtual^.infoUm, ' ]');
+            verbete := noAtual^.infoDois;
+            if verbete = nil then
+                writeln(' (Nenhum verbete neste nó)')
+            else
+            begin
+                while verbete <> nil do
+                begin
+                    writeln(' [PT] ', verbete^.infoUm,
+                        ' ->  [EN] ', verbete^.infoDois^.infoUm);
+                    
+                    verbete := verbete^.prox;
+                end;
+            end;
+            noAtual := noAtual^.prox;
+        end;
+        readkey;
+    end;
+end;
+
 begin
     opcao := 1;
     CriarListaDupla(str_lista);
@@ -339,7 +373,10 @@ begin
                 Consultar(str_lista, str);
             end;
             
-            5: writeln('em breve...');
+            5: begin
+                clrscr;
+                EscreveTudo(str_lista);
+            end;
         end;
     end;
 end.
