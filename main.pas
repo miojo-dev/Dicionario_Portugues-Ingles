@@ -14,7 +14,7 @@ type
 
 var
     opcao: byte;
-    str, strIngles: TInfo;
+    strChave, str, strIngles: TInfo;
     str_lista: TNode;
 
 function BuscarNo(lista: TNode; valor: TInfo): TNode;
@@ -101,7 +101,7 @@ begin
         
         if noCerto = nil then
         begin
-            write('Elemento não encontrado!');
+            write('Elemento nao encontrado!');
             readkey;
         end
         else
@@ -132,68 +132,45 @@ begin
         AdicionarDupla(lista, chave);
 end;
 
-function BuscarNoCerto(lista: TNode; verbete: TInfo): TNode;
-var atual: TNode;
-    encontrado: boolean;
-begin
-    atual := lista;
-    encontrado := false;
-
-    while(atual <> nil) and (not encontrado) do
-    begin
-        if atual^.infoUm > verbete then
-            encontrado := true
-        else
-            atual := atual^.prox;
-    end;
-
-    if encontrado then
-        BuscarNoCerto := atual
-    else
-        BuscarNoCerto := nil;
-end;
-
-procedure InserirVerbete(var lista: TNode; verbetePT, verbeteEN: TInfo);
+procedure InserirVerbete(var lista: TNode; chave, verbetePT, verbeteEN: TInfo);
 var noCerto, noVerbete, noTraducao, anterior, atual: TNode;
 begin
-    noCerto := BuscarNoCerto(lista, verbetePT);
+    // Busca a chave exata informada pelo usuário
+    noCerto := BuscarNo(lista, chave);
 
     if noCerto = nil then
     begin
-        writeln('Ainda não há uma chave válida para "', 
-            verbetePT, '", cadastre uma chave válida primeiro!');
+        writeln('Palavra-chave "', chave, '" nao encontrada! Cadastre a chave primeiro.');
         readkey;
     end
     else
     begin
         if BuscarNo(noCerto^.infoDois, verbetePT) <> nil then
         begin
-            writeln('"', verbetePT, '" ja existe no grupo de "',
-                noCerto^.infoUm, '"!');
+            writeln('"', verbetePT, '" ja existe no grupo de "', noCerto^.infoUm, '"!');
             readkey;
         end
         else
         begin
-            //noTraducao guarda valor em inglês
+            // noTraducao guarda valor em inglês
             new(noTraducao);
             noTraducao^.ant := nil;
             noTraducao^.infoUm := verbeteEN;
             noTraducao^.infoDois := nil;
             noTraducao^.prox := nil;
 
-            //noVerbete guarda valor em português
+            // noVerbete guarda valor em português
             new(noVerbete);
             noVerbete^.ant := nil;
             noVerbete^.infoUm := verbetePT;
             noVerbete^.infoDois := noTraducao;
             noVerbete^.prox := nil;
 
-            noTraducao^.infoDois := noVerbete;
-
-            if (noCerto^.infoDois = nil) or 
-                (verbetePT < noCerto^.infoDois^.infoUm) then
+            if (noCerto^.infoDois = nil) or (verbetePT < noCerto^.infoDois^.infoUm) then
             begin
                 noVerbete^.prox := noCerto^.infoDois;
+                if noCerto^.infoDois <> nil then
+                    noCerto^.infoDois^.ant := noVerbete; // Atualiza o anterior
                 noCerto^.infoDois := noVerbete;
             end
             else
@@ -208,68 +185,65 @@ begin
                 end;
 
                 noVerbete^.prox := atual;
+                noVerbete^.ant := anterior; // Correção do encadeamento duplo
                 anterior^.prox := noVerbete;
+                if atual <> nil then
+                    atual^.ant := noVerbete; // Correção do encadeamento duplo
             end;
 
-            writeln('"', verbetePT, ' -> ', verbeteEN,
-                '" inserido no grupo de "', noCerto^.infoUm, '".');
+            writeln('"', verbetePT, ' -> ', verbeteEN, '" inserido no grupo de "', noCerto^.infoUm, '".');
             readkey;
         end;
     end;
 end;
 
-procedure RemoverVerbete(var lista: TNode; verbetePT:TInfo);
-var noCerto, anterior, atual: TNode;
+procedure RemoverVerbete(var lista: TNode; chave, verbetePT:TInfo);
+var noCerto, atual: TNode;
 begin
-    noCerto := BuscarNoCerto(lista, verbetePT);
+    noCerto := BuscarNo(lista, chave);
     
     if noCerto = nil then
     begin
-        writeln('Nenhum grupo encontrado para "', verbetePT, '"!');
+        writeln('Palavra-chave "', chave, '" nao encontrada!');
         readkey;
     end
     else
     begin
-        anterior := nil;
-        atual := noCerto^.infoDois;
-        
-        while (atual <> nil) and (atual^.infoUm <> verbetePT) do
-        begin
-            anterior := atual;
-            atual := atual^.prox;
-        end;
+        atual := BuscarNo(noCerto^.infoDois, verbetePT);
         
         if atual = nil then
         begin
-            writeln('"', verbetePT, '" nao encontrado no grupo de "',
-                noCerto^.infoUm, '"');
+            writeln('"', verbetePT, '" nao encontrado no grupo de "', noCerto^.infoUm, '"');
             readkey;
         end
         else
         begin
-            if anterior = nil then
+            // Lógica de remoção com duplo encadeamento
+            if atual^.ant = nil then
                 noCerto^.infoDois := atual^.prox
             else
-                anterior^.prox := atual^.prox;
+                atual^.ant^.prox := atual^.prox;
             
-            dispose(atual^.infoDois);
-            dispose(atual);
+            if atual^.prox <> nil then
+                atual^.prox^.ant := atual^.ant;
             
-            writeln('"', verbetePT, '" removido do grupo de "',
-                noCerto^.infoUm, '"');
+            dispose(atual^.infoDois); // Remove o nó da tradução em inglês primeiro
+            dispose(atual);           // Remove o nó do verbete em português
+            
+            writeln('"', verbetePT, '" removido do grupo de "', noCerto^.infoUm, '"');
             readkey;
         end;
     end;
 end;
 
-procedure Consultar(lista: Tnode; verbetePT: TInfo);
+procedure Consultar(lista: Tnode; chave, verbetePT: TInfo);
 var noCerto, noVerbete: TNode;
 begin
-    noCerto := BuscarNoCerto(lista, verbetePT);
+    noCerto := BuscarNo(lista, chave);
     
     if noCerto = nil then
     begin
-        writeln('"', verbetePT, '" nao encontrado!');
+        writeln('Palavra-chave "', chave, '" nao encontrada!');
         readkey;
     end
     else
@@ -278,14 +252,12 @@ begin
         
         if noVerbete = nil then
         begin
-            writeln('"', verbetePT, '" nao encontrado no grupo de "',
-                noCerto^.infoUm, '"!');
+            writeln('"', verbetePT, '" nao encontrado no grupo de "', noCerto^.infoUm, '"!');
             readkey;
         end
         else
         begin
-            writeln('[PT] ', noVerbete^.infoUm,
-                    ' -> [EN] ', noVerbete^.infoDois^.infoUm);
+            writeln('[PT] ', noVerbete^.infoUm, ' -> [EN] ', noVerbete^.infoDois^.infoUm);
             writeln('(grupo: ', noCerto^.infoUm, ')');
             readkey;
         end;
@@ -297,7 +269,7 @@ var noAtual, verbete: TNode;
 begin
     if lista = nil then
     begin
-        writeln('Dicionário vazio!');
+        writeln('Dicionario vazio!');
         readkey;
     end
     else
@@ -309,14 +281,12 @@ begin
             writeln('[ ', noAtual^.infoUm, ' ]');
             verbete := noAtual^.infoDois;
             if verbete = nil then
-                writeln(' (Nenhum verbete neste nó)')
+                writeln(' (Nenhum verbete neste no)')
             else
             begin
                 while verbete <> nil do
                 begin
-                    writeln(' [PT] ', verbete^.infoUm,
-                        ' ->  [EN] ', verbete^.infoDois^.infoUm);
-                    
+                    writeln('  [PT] ', verbete^.infoUm, ' ->  [EN] ', verbete^.infoDois^.infoUm);
                     verbete := verbete^.prox;
                 end;
             end;
@@ -352,25 +322,31 @@ begin
 
             2: begin
                 clrscr;
-                write('Insira o verbete em portugues: ');
+                write('Insira a palavra-chave (grupo)  : ');
+                readln(strChave);
+                write('Insira o verbete em portugues : ');
                 readln(str);
-                write('Insira a traducao em ingles  : ');
+                write('Insira a traducao em ingles   : ');
                 readln(strIngles);
-                InserirVerbete(str_lista, str, strIngles);
+                InserirVerbete(str_lista, strChave, str, strIngles);
             end;
             
             3: begin
                 clrscr;
+                write('Insira a palavra-chave (grupo) : ');
+                readln(strChave);
                 write('Digite o verbete a ser removido: ');
                 readln(str);
-                RemoverVerbete(str_lista, str);
+                RemoverVerbete(str_lista, strChave, str);
             end;
             
             4: begin
                 clrscr;
+                write('Insira a palavra-chave (grupo)   : ');
+                readln(strChave);
                 write('Insira o verbete a ser consultado: ');
                 readln(str);
-                Consultar(str_lista, str);
+                Consultar(str_lista, strChave, str);
             end;
             
             5: begin
