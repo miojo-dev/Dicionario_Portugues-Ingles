@@ -185,10 +185,10 @@ begin
                 end;
 
                 noVerbete^.prox := atual;
-                noVerbete^.ant := anterior; // Correção do encadeamento duplo
+                noVerbete^.ant := anterior; 
                 anterior^.prox := noVerbete;
                 if atual <> nil then
-                    atual^.ant := noVerbete; // Correção do encadeamento duplo
+                    atual^.ant := noVerbete; 
             end;
 
             writeln('"', verbetePT, ' -> ', verbeteEN, '" inserido no grupo de "', noCerto^.infoUm, '".');
