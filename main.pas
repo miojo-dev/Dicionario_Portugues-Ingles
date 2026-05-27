@@ -16,6 +16,7 @@ var
     opcao: byte;
     str, strIngles: TInfo;
     str_lista: TNode;
+    fim: TNode;
 
 function BuscarNo(lista: TNode; valor: TInfo): TNode;
 var atual: TNode;
@@ -41,6 +42,7 @@ end;
 procedure CriarListaDupla(var lista : TNode);
 begin
     lista := nil;
+    fim := nil;
 end;
 
 procedure AdicionarDupla(var lista : TNode; infoUm : TInfo);
@@ -67,6 +69,9 @@ begin
                 lista^.ant := aux;
             
             lista := aux;
+            
+            if aux^.prox = nil then
+                fim := aux;
         end
         else
         begin
@@ -82,6 +87,10 @@ begin
             aux^.prox := atual;
             aux^.ant := anterior;
             anterior^.prox := aux;
+            
+            if aux^.prox = nil then
+                fim := aux;
+            
             if atual <> nil then
                 atual^.ant := aux;
         end;
@@ -193,6 +202,9 @@ begin
                     
                 if noRemover^.prox <> nil then
                     noRemover^.prox^.ant := noRemover^.ant;
+                
+                if noRemover = fim then
+                    fim := noRemover^.ant;
                 
                 writeln('Elemento ', noRemover^.infoUm,
                     ' removidos seus itens filhos transferidos!');
@@ -408,6 +420,37 @@ begin
     end;
 end;
 
+procedure EscreveTudoInverso(ultimo: TNode);
+var noAtual, verbete: TNode;
+begin
+    if ultimo = nil then
+    begin
+        writeln('Dicionario vazio!'); readkey;
+    end
+    else
+    begin
+        noAtual := ultimo;
+        while noAtual <> nil do
+        begin
+            writeln('[ ', noAtual^.infoUm, ' ]');
+            verbete := noAtual^.infoDois;
+            if verbete = nil then
+                writeln(' (Nenhum verbete neste no)')
+            else
+            begin
+                while verbete <> nil do
+                begin
+                    writeln(' [PT] ', verbete^.infoUm,
+                        ' ->  [EN] ', verbete^.infoDois^.infoUm);
+                    verbete := verbete^.prox;
+                end;
+            end;
+            noAtual := noAtual^.ant;
+        end;
+        readkey;
+    end;
+end;
+
 begin
     opcao := 1;
     CriarListaDupla(str_lista);
@@ -465,7 +508,16 @@ begin
             
             6: begin
                 clrscr;
-                EscreveTudo(str_lista);
+                write('Em qual ordem?');
+                writeln('1 - Alfabética');
+                writeln('2 - Reversa');
+                readln(opcao);
+                writeln;
+                
+                case opcao of
+                    1: EscreveTudo(str_lista);
+                    2: EscreveTudoInverso(fim);
+                end;
             end;
         end;
     end;
