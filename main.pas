@@ -13,7 +13,7 @@ type
     end;
 
 var
-    opcao: byte;
+    opcao, subOpcao: byte;
     str, strIngles: TInfo;
     str_lista: TNode;
     fim: TNode;
@@ -458,13 +458,13 @@ begin
     while opcao <> 0 do
     begin
         clrscr;
-        writeln('0 - Sair');
         writeln('1 - Incluir Palavra-Chave');
         writeln('2 - Remover Palavra-Chave');
         writeln('3 - Incluir Palavra');
         writeln('4 - Remover Palavra');
         writeln('5 - Consultar');
         writeln('6 - Escrever todo o dicionario');
+        writeln('0 - Sair');
         readln(opcao);
         writeln;
 
@@ -509,14 +509,17 @@ begin
             6: begin
                 clrscr;
                 write('Em qual ordem?');
+                writeln;
                 writeln('1 - Alfabética');
                 writeln('2 - Reversa');
+                writeln('3 - Voltar');
                 readln(opcao);
                 writeln;
-                
+
                 case opcao of
                     1: EscreveTudo(str_lista);
                     2: EscreveTudoInverso(fim);
+                    3:;
                 end;
             end;
         end;
