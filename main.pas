@@ -13,7 +13,7 @@ type
     end;
 
 var
-    opcao, subOpcao: byte;
+    opcao: integer;
     str, strIngles: TInfo;
     str_lista: TNode;
     fim: TNode;
