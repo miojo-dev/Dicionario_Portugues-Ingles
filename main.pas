@@ -216,6 +216,7 @@ begin
 end;
 
 procedure InserirChave(var lista: TNode; chave:TInfo);
+var novaChave, proxNo, verbete, proxVerbete: TNode;
 begin
     if BuscarNo(lista, chave) <> nil then
     begin
@@ -223,7 +224,31 @@ begin
         readkey;
     end
     else
+    begin
         AdicionarDupla(lista, chave);
+        
+        novaChave := BuscarNo(lista, chave);
+        if (novaChave <> nil) and (novaChave^.prox <> nil) then
+        begin
+            proxNo := novaChave^.prox;
+            verbete := proxNo^.infoDois;
+            proxNo^.infoDois := nil;
+            
+            while verbete <> nil do
+            begin
+                proxVerbete := verbete^.prox;
+                verbete^.prox := nil;
+                verbete^.ant := nil;
+                
+                if verbete^.infoUm < chave then
+                    TransferirPalavra(novaChave^.infoDois, verbete)
+                else
+                    TransferirPalavra(proxNo^.infoDois, verbete);
+                    
+                verbete := proxVerbete;
+            end;
+        end;
+    end;
 end;
 
 function BuscarNoCerto(lista: TNode; verbete: TInfo): TNode;
